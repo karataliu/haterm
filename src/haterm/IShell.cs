@@ -1,7 +1,8 @@
 ﻿namespace haterm
 {
-    interface IShell
+    public interface IShell
     {
+        string CurrentDir { get; }
         void Run(string input);
     }
 }

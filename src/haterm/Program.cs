@@ -12,19 +12,30 @@ namespace haterm
 
     public class MyConsole
     {
-        public delegate void ConsoleHandler(MyContext console);
-
         private readonly IConsole console;
+        private readonly IShell shell;
         private StringBuilder lb = new StringBuilder();
 
-        public MyConsole(IConsole console)
+        public MyConsole(IConsole console, IShell shell)
         {
             this.console = console;
+            this.shell = shell;
         }
 
-        public event ConsoleHandler OnTab;
-        public event ConsoleHandler OnEnter;
-        public event ConsoleHandler OnWhitespace;
+        private void OnTab()
+        {
+        }
+
+        private void OnEnter()
+        {
+            this.shell.Run(lb.ToString());
+            lb.Clear();
+            this.console.WriteLine(this.shell.CurrentDir);
+        }
+
+        private void OnWHitespace()
+        {
+        }
 
         public void Run()
         {
@@ -34,21 +45,20 @@ namespace haterm
                 var ch = key.KeyChar;
                 if (ch == 13)
                 {
-                    this.OnEnter?.Invoke(this.GetContext());
-                    lb.Clear();
+                    this.OnEnter();
                 }else if (ch == '\b')
                 {
                     lb.Remove(lb.Length - 1, 1);
                     this.console.Write("\b \b");
                 }else if (ch == '\t')
                 {
-                    this.OnTab?.Invoke(this.GetContext());
+                    this.OnTab();
                 }
                 else if (ch == 32)
                 {
                     lb.Append(ch);
                     var ctx = this.GetContext();
-                    this.OnWhitespace?.Invoke(ctx);
+                    this.OnWHitespace();
                     if (ctx.Current != null)
                     {
                         this.console.Write('\r');
@@ -80,19 +90,9 @@ namespace haterm
             IConsole console = CmdConsole.Instance;
             var shell = new CmdShell(console);
 
-            StringBuilder lb = new StringBuilder();
             var rd = new CmdRender();
 
-            var mc = new MyConsole(console);
-            mc.OnEnter += (context) =>
-            {
-                shell.Run(context.Line);
-            };
-
-            mc.OnWhitespace += (context) =>
-            {
-                context.Current = rd.Render(context.Line);
-            };
+            var mc = new MyConsole(console, shell);
 
             mc.Run();
         }

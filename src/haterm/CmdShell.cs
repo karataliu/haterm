@@ -1,23 +1,38 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace haterm
 {
     public class CmdShell : IShell, IDisposable
     {
+        private const string Rem = "rem";
+        private readonly string HaRunId = Guid.NewGuid().ToString();
+        private readonly string HaStart;
+        private readonly string HaLineStart;
+        private readonly string HaLineEnd;
         private Process cmdproc;
-        private ProcessThread mainThread;
         private IConsole console;
+        private ManualResetEventSlim startEvent = new ManualResetEventSlim(false);
+        private ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
+
+        public string CurrentDir { get; set; }
 
         public CmdShell(IConsole console)
         {
             this.console = console;
+            HaStart = $"{Rem} {HaRunId}{nameof(HaStart)}";
+            HaLineStart = $"{Rem} {HaRunId}{nameof(HaLineStart)}";
+            HaLineEnd = $"{Rem} {HaRunId}{nameof(HaLineEnd)}";
+
             CmdInit();
         }
 
         public void Run(string input)
         {
             cmdproc.StandardInput.WriteLine(input);
+            cmdproc.StandardInput.WriteLine(HaLineEnd);
+            this.lineEvent.Wait();
         }
 
         public void Dispose()
@@ -25,6 +40,11 @@ namespace haterm
             this.cmdproc?.CancelOutputRead();
             this.cmdproc?.CancelOutputRead();
             this.cmdproc?.Kill();
+        }
+
+        private void UpdateCd()
+        {
+            this.Run(Rem);
         }
 
         private void CmdInit()
@@ -41,14 +61,22 @@ namespace haterm
 
             cmdproc = Process.Start(startInfo);
 
-            foreach (ProcessThread thread in cmdproc.Threads)
-            {
-                mainThread = thread;
-                break;
-            }
-
             this.cmdproc.OutputDataReceived += (sender, args) =>
             {
+                var line = args.Data;
+                if (line.EndsWith(this.HaStart))
+                {
+                    this.startEvent.Set();
+                    return;
+                }
+
+                if (line.EndsWith(this.HaLineEnd))
+                {
+                    this.CurrentDir = line.Substring(0, line.Length-this.HaLineEnd.Length - 1);
+                    this.lineEvent.Set();
+                    return;
+                }
+
                 console.WriteLine(args.Data);
             };
 
@@ -64,6 +92,11 @@ namespace haterm
                 this.console.WriteLine("");
             };
             this.cmdproc.BeginErrorReadLine();
+
+            this.Run(this.HaStart);
+            this.startEvent.Wait();
+            UpdateCd();
+            this.console.WriteLine("Ready.");
         }
     }
 }
