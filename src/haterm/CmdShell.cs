@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 
 namespace haterm
 {
@@ -8,21 +7,22 @@ namespace haterm
     {
         private Process cmdproc;
         private ProcessThread mainThread;
-        private StringBuilder buffer = new StringBuilder();
+        private IConsole console;
 
-        public CmdShell()
+        public CmdShell(IConsole console)
         {
+            this.console = console;
             CmdInit();
         }
 
-        public string Run(string input)
+        public void Run(string input)
         {
             cmdproc.StandardInput.WriteLine(input);
-            return GetCurrentOutput();
         }
 
         public void Dispose()
         {
+            this.cmdproc?.CancelOutputRead();
             this.cmdproc?.Kill();
         }
 
@@ -35,7 +35,8 @@ namespace haterm
                 RedirectStandardError = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                
             };
 
             cmdproc = Process.Start(startInfo);
@@ -47,28 +48,12 @@ namespace haterm
             }
 
             this.cmdproc.OutputDataReceived += Cmdproc_OutputDataReceived;
-
             this.cmdproc.BeginOutputReadLine();
-            var b = GetCurrentOutput();
-      //  this.cmdproc.CancelOutputRead();
         }
 
         private void Cmdproc_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            buffer.Append(e.Data);
-        }
-
-        private string GetCurrentOutput()
-        {
-            while (mainThread.ThreadState != ThreadState.Wait)
-            {
-                System.Threading.Thread.Sleep(1000);
-            }
-
-            var str = buffer.ToString();
-            buffer.Clear();
-           // this.cmdproc.CancelOutputRead();
-            return str;
+            console.WriteLine(e.Data);
         }
     }
 }

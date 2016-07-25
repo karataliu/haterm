@@ -2,6 +2,6 @@
 {
     interface IShell
     {
-        string Run(string input);
+        void Run(string input);
     }
 }

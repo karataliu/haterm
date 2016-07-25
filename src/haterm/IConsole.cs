@@ -1,4 +1,6 @@
-﻿namespace haterm
+﻿using System;
+
+namespace haterm
 {
     public interface IConsole
     {
@@ -8,6 +10,8 @@
         int CursorLeft { get; }
         void SetCursorPosition(int cursorTop, int cursorLeft);
         void Write(string data);
+        void WriteLine(string data);
+        ConsoleKeyInfo ReadKey();
     }
 
     public static class ExtensionMethods

@@ -8,13 +8,17 @@ namespace haterm
     {
         public static void Main(string[] args)
         {
-            //IConsole console = CmdConsole.Instance;
-            //Console.WriteLine(console.ToDebugInfo());
+            IConsole console = CmdConsole.Instance;
+            console.WriteLine(console.ToDebugInfo());
 
-         
-            var shell = new CmdShell();
-            var out1 = shell.Run("dir");
-            Console.WriteLine(out1);
+            var shell = new CmdShell(console);
+            shell.Run("dir");
+
+            while (true)
+            {
+                var key = console.ReadKey();
+                console.Write("P" + key.KeyChar);
+            }
 
         }
     }
