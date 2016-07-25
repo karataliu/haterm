@@ -13,6 +13,9 @@ namespace haterm
         void Write(string data);
         void Write1(params TextBlock[] blocks);
         void WriteLine(string data);
+        void ClearLine();
+        void ClearScreen();
+        void Backspace();
         ConsoleKeyInfo ReadKey();
     }
 

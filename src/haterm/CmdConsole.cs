@@ -53,6 +53,21 @@ namespace haterm
         public void WriteLine(string data)
             => Console.WriteLine(data);
 
+        public void ClearLine()
+        {
+            Console.Write('\r');
+        }
+
+        public void ClearScreen()
+        {
+            Console.Clear();
+        }
+
+        public void Backspace()
+        {
+           Console.Write("\b \b");
+        }
+
         public ConsoleKeyInfo ReadKey()
             => Console.ReadKey(true);
     }

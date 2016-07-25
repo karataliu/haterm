@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace haterm
@@ -19,6 +20,8 @@ namespace haterm
         private StringBuilder lb = new StringBuilder();
 
         private Dictionary<ConsoleKey, Action> dic;
+        private Dictionary<ConsoleKey, Action> ctrlDic;
+
 
         public MyConsole(IConsole console, IShell shell)
         {
@@ -30,6 +33,16 @@ namespace haterm
                 {ConsoleKey.Backspace   , this.OnBackspace  },
                 {ConsoleKey.Spacebar    , this.OnWhitespace },
             };
+
+            ctrlDic = new Dictionary<ConsoleKey, Action>
+            {
+                {ConsoleKey.L           , this.Clear        },
+            };
+        }
+
+        private void Clear()
+        {
+            this.console.ClearScreen();
         }
 
         private void OnEnter()
@@ -42,14 +55,14 @@ namespace haterm
         private void OnBackspace()
         {
             lb.Remove(lb.Length - 1, 1);
-            this.console.Write("\b \b");
+            this.console.Backspace();
         }
 
         private void OnWhitespace()
         {
             lb.Append(' ');
             var ctx=rd.Render(lb.ToString());
-            this.console.Write('\r');
+            this.console.ClearLine();
             this.console.Write1(ctx.ToArray());
         }
 
@@ -59,7 +72,13 @@ namespace haterm
             {
                 var key = console.ReadKey();
                 Action action;
-                if (dic.TryGetValue(key.Key, out action))
+                IDictionary<ConsoleKey, Action> lookup = dic;
+                if (key.Modifiers == ConsoleModifiers.Control)
+                {
+                    lookup = ctrlDic;
+                }
+
+                if (lookup.TryGetValue(key.Key, out action))
                 {
                     action();
                 }
@@ -81,9 +100,8 @@ namespace haterm
     {
         public static void Main(string[] args)
         {
-            IConsole console = CmdConsole.Instance;
+            var console = CmdConsole.Instance;
             var shell = new CmdShell(console);
-            
             var mc = new MyConsole(console, shell);
 
             mc.Run();
