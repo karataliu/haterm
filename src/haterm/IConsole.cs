@@ -11,6 +11,7 @@ namespace haterm
         void SetCursorPosition(int cursorTop, int cursorLeft);
         void Write(char data);
         void Write(string data);
+        void Write1(params TextBlock[] blocks);
         void WriteLine(string data);
         ConsoleKeyInfo ReadKey();
     }

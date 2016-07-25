@@ -27,6 +27,29 @@ namespace haterm
         public void Write(string data)
             => Console.Write(data);
 
+        public void Write1(params TextBlock[] blocks)
+        {
+            var cf = Console.ForegroundColor;
+            var cb = Console.BackgroundColor;
+            foreach (var textBlock in blocks)
+            {
+                if (textBlock.Foreground.HasValue)
+                {
+                    Console.ForegroundColor = textBlock.Foreground.Value;
+                }
+
+                if (textBlock.Background.HasValue)
+                {
+                    Console.BackgroundColor = textBlock.Background.Value;
+                }
+
+                Console.Write(textBlock.Text);
+            }
+
+            Console.ForegroundColor = cf;
+            Console.BackgroundColor = cb;
+        }
+
         public void WriteLine(string data)
             => Console.WriteLine(data);
 
