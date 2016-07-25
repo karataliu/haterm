@@ -2,15 +2,19 @@
 {
     public interface IConsole
     {
-        int Width { get; }
         int Height { get; }
+        int Width { get; }
+        int CursorTop { get; }
+        int CursorLeft { get; }
+        void SetCursorPosition(int cursorTop, int cursorLeft);
+        void Write(string data);
     }
 
     public static class ExtensionMethods
     {
         public static string ToDebugInfo(this IConsole console)
         {
-            return $"Haconsole Width:{console.Width}, Height:{console.Height}";
+            return $"Haconsole Height:{console.Height},Width:{console.Width},CTop:{console.CursorTop},CLeft:{console.CursorLeft}";
         }
     }
 }

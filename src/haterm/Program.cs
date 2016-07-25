@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace haterm
 {
@@ -7,12 +8,23 @@ namespace haterm
         public static void Main(string[] args)
         {
             IConsole console = CmdConsole.Instance;
+            Console.WriteLine(console.ToDebugInfo());
 
-            while (true)
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                Console.WriteLine(console.ToDebugInfo());
-                Console.ReadLine();
-            }
+                FileName = "cmd",
+                UseShellExecute = false,
+                RedirectStandardError = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            };
+
+            var process = Process.Start(startInfo);
+            //while (!process.StandardOutput.EndOfStream)
+            //{
+            //    string line = process.StandardOutput.ReadLine();
+            //    Console.WriteLine(line);
+            //}
         }
     }
 }
