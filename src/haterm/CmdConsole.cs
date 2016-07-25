@@ -8,8 +8,8 @@ namespace haterm
 
         private CmdConsole()
         {
-            Console.BackgroundColor = ConsoleColor.DarkGray;
-            Console.ForegroundColor = ConsoleColor.White;
+            // Console.BackgroundColor = ConsoleColor.DarkGray;
+            // Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
         }
 

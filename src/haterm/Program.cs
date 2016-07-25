@@ -31,7 +31,7 @@ namespace haterm
             {
                 {ConsoleKey.Enter       , this.OnEnter      },
                 {ConsoleKey.Backspace   , this.OnBackspace  },
-              //  {ConsoleKey.Spacebar    , this.OnWhitespace },
+                {ConsoleKey.Spacebar    , this.OnWhitespace },
             };
 
             ctrlDic = new Dictionary<ConsoleKey, Action>
@@ -43,6 +43,7 @@ namespace haterm
         private void Clear()
         {
             this.console.ClearScreen();
+            this.WritePrompt();
         }
 
         private void OnEnter()
@@ -55,8 +56,8 @@ namespace haterm
 
         private void OnBackspace()
         {
-            lb.Remove(lb.Length - 1, 1);
-            this.console.Backspace();
+            if(lb.Length>0) lb.Remove(lb.Length - 1, 1);
+            if(this.console.CursorLeft > this.Prompt.Length) this.console.Backspace();
         }
 
         private void OnWhitespace()
@@ -64,12 +65,16 @@ namespace haterm
             lb.Append(' ');
             var ctx=rd.Render(lb.ToString());
             this.console.ClearLine();
+            this.WritePrompt();
             this.console.Write1(ctx.ToArray());
         }
 
+        public string Prompt
+            => this.shell.CurrentDir + "=>";
+
         private void WritePrompt()
         {
-            this.console.Write(this.shell.CurrentDir + "==>");
+            this.console.Write(this.Prompt);
             Console.Out.Flush();
         }
 
