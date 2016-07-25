@@ -23,6 +23,7 @@ namespace haterm
         public void Dispose()
         {
             this.cmdproc?.CancelOutputRead();
+            this.cmdproc?.CancelOutputRead();
             this.cmdproc?.Kill();
         }
 
@@ -32,7 +33,7 @@ namespace haterm
             {
                 FileName = "cmd",
                 UseShellExecute = false,
-                RedirectStandardError = false,
+                RedirectStandardError = true,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
@@ -46,13 +47,23 @@ namespace haterm
                 break;
             }
 
-            this.cmdproc.OutputDataReceived += Cmdproc_OutputDataReceived;
-            this.cmdproc.BeginOutputReadLine();
-        }
+            this.cmdproc.OutputDataReceived += (sender, args) =>
+            {
+                console.WriteLine(args.Data);
+            };
 
-        private void Cmdproc_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            console.WriteLine(e.Data);
+            this.cmdproc.BeginOutputReadLine();
+
+            this.cmdproc.ErrorDataReceived += (sender, args) =>
+            {
+                this.console.Write1(new TextBlock
+                {
+                    Text = args.Data,
+                    Foreground = ConsoleColor.Red
+                });
+                this.console.WriteLine("");
+            };
+            this.cmdproc.BeginErrorReadLine();
         }
     }
 }
