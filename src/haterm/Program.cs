@@ -1,13 +1,21 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace haterm
 {
+    public class MyContext
+    {
+        public string Line { get; set; }
+        public IEnumerable<TextBlock> Current { get; set; }
+    }
+
     public class MyConsole
     {
-        public delegate int ConsoleHandler(IConsole console);
+        public delegate void ConsoleHandler(MyContext console);
 
         private readonly IConsole console;
+        private StringBuilder lb = new StringBuilder();
 
         public MyConsole(IConsole console)
         {
@@ -23,13 +31,46 @@ namespace haterm
             while (true)
             {
                 var key = console.ReadKey();
-                if (key.KeyChar == 13)
+                var ch = key.KeyChar;
+                if (ch == 13)
                 {
-                    var x= this.OnEnter.Invoke(this.console);
-                    Console.WriteLine(x);
+                    this.OnEnter?.Invoke(this.GetContext());
+                    lb.Clear();
+                }else if (ch == '\b')
+                {
+                    lb.Remove(lb.Length - 1, 1);
+                    this.console.Write("\b \b");
+                }else if (ch == '\t')
+                {
+                    this.OnTab?.Invoke(this.GetContext());
+                }
+                else if (ch == 32)
+                {
+                    lb.Append(ch);
+                    var ctx = this.GetContext();
+                    this.OnWhitespace?.Invoke(ctx);
+                    if (ctx.Current != null)
+                    {
+                        this.console.Write('\r');
+                        this.console.Write1(ctx.Current.ToArray());
+                    }
+                    else
+                    {
+                        this.console.Write(ch);
+                    }
+                }
+                else
+                {
+                    lb.Append(ch);
+                    this.console.Write(ch);
                 }
             }
         }
+
+        private MyContext GetContext() => new MyContext
+        {
+            Line = lb.ToString()
+        };
     }
 
     public class Program
@@ -40,39 +81,20 @@ namespace haterm
             var shell = new CmdShell(console);
 
             StringBuilder lb = new StringBuilder();
-            var rd = new CmdRender(console);
+            var rd = new CmdRender();
 
             var mc = new MyConsole(console);
-            mc.OnEnter += (con) =>
+            mc.OnEnter += (context) =>
             {
-                shell.Run("echo 1");
-                return 2;
+                shell.Run(context.Line);
+            };
+
+            mc.OnWhitespace += (context) =>
+            {
+                context.Current = rd.Render(context.Line);
             };
 
             mc.Run();
-
-
-            //while (true)
-            //{
-            //    var key = console.ReadKey();
-            //    if (key.KeyChar == 13)
-            //    {
-            //        shell.Run(lb.ToString());
-            //        lb.Clear();
-            //    }
-            //    else
-            //    {
-            //        lb.Append(key.KeyChar);
-            //        console.Write(key.KeyChar);
-
-            //        rd.Render(lb.ToString());
-            //        console.Write1(new TextBlock
-            //        {
-            //            Text = "s3",
-            //            Foreground = ConsoleColor.Yellow,
-            //        });
-            //    }
-            //}
         }
     }
 }

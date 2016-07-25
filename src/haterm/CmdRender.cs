@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace haterm
@@ -12,20 +13,17 @@ namespace haterm
 
     public class CmdRender
     {
-        private readonly IConsole console;
-
         private string[] supportedCmd = new[]
         {
             "dir",
             "git",
         };
 
-        public CmdRender(IConsole console)
+        public CmdRender()
         {
-            this.console = console;
         }
 
-        public void Render(string line)
+        public IEnumerable<TextBlock> Render(string line)
         {
             var pattern = new Regex("^(.*?) (.*)$");
             var match = pattern.Match(line);
@@ -34,8 +32,25 @@ namespace haterm
                 var cmd = match.Groups[1];
                 var parameter = match.Groups[2];
 
-                //this.console.Write1($"\r5{cmd} 6{parameter}");
+                return new[]
+                {
+                    new TextBlock
+                    {
+                        Text = cmd.Value,
+                        Foreground = ConsoleColor.Green,
+                    },
+                    new TextBlock
+                    {
+                        Text = " "+ parameter.Value,
+                        Foreground = ConsoleColor.Yellow,
+                    }
+                };
             }
+
+            return new[] { new TextBlock
+            {
+                 Text = line
+            }};
         }
     }
 }
