@@ -31,7 +31,7 @@ namespace haterm
             {
                 {ConsoleKey.Enter       , this.OnEnter      },
                 {ConsoleKey.Backspace   , this.OnBackspace  },
-                {ConsoleKey.Spacebar    , this.OnWhitespace },
+              //  {ConsoleKey.Spacebar    , this.OnWhitespace },
             };
 
             ctrlDic = new Dictionary<ConsoleKey, Action>
@@ -47,9 +47,10 @@ namespace haterm
 
         private void OnEnter()
         {
+            this.console.WriteLine("");
             this.shell.Run(lb.ToString());
             lb.Clear();
-            this.console.WriteLine(this.shell.CurrentDir);
+            this.WritePrompt();
         }
 
         private void OnBackspace()
@@ -66,8 +67,15 @@ namespace haterm
             this.console.Write1(ctx.ToArray());
         }
 
+        private void WritePrompt()
+        {
+            this.console.Write(this.shell.CurrentDir + "==>");
+            Console.Out.Flush();
+        }
+
         public void Run()
         {
+            this.WritePrompt();
             while (true)
             {
                 var key = console.ReadKey();

@@ -8,12 +8,9 @@ namespace haterm
     {
         private const string Rem = "rem";
         private readonly string HaRunId = Guid.NewGuid().ToString();
-        private readonly string HaStart;
-        private readonly string HaLineStart;
         private readonly string HaLineEnd;
         private Process cmdproc;
         private IConsole console;
-        private ManualResetEventSlim startEvent = new ManualResetEventSlim(false);
         private ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
 
         public string CurrentDir { get; set; }
@@ -21,8 +18,6 @@ namespace haterm
         public CmdShell(IConsole console)
         {
             this.console = console;
-            HaStart = $"{Rem} {HaRunId}{nameof(HaStart)}";
-            HaLineStart = $"{Rem} {HaRunId}{nameof(HaLineStart)}";
             HaLineEnd = $"{Rem} {HaRunId}{nameof(HaLineEnd)}";
 
             CmdInit();
@@ -31,8 +26,14 @@ namespace haterm
         public void Run(string input)
         {
             cmdproc.StandardInput.WriteLine(input);
+            UpdateCwd();
+        }
+
+        private void UpdateCwd()
+        {
             cmdproc.StandardInput.WriteLine(HaLineEnd);
             this.lineEvent.Wait();
+            this.lineEvent.Reset();
         }
 
         public void Dispose()
@@ -40,11 +41,6 @@ namespace haterm
             this.cmdproc?.CancelOutputRead();
             this.cmdproc?.CancelOutputRead();
             this.cmdproc?.Kill();
-        }
-
-        private void UpdateCd()
-        {
-            this.Run(Rem);
         }
 
         private void CmdInit()
@@ -61,19 +57,28 @@ namespace haterm
 
             cmdproc = Process.Start(startInfo);
 
+            int skipLine = 0;
             this.cmdproc.OutputDataReceived += (sender, args) =>
             {
                 var line = args.Data;
-                if (line.EndsWith(this.HaStart))
+                if (line == null)
                 {
-                    this.startEvent.Set();
                     return;
                 }
 
+                if (skipLine > 0)
+                {
+                    --skipLine;
+                    return;
+                }
+
+                
+
                 if (line.EndsWith(this.HaLineEnd))
                 {
-                    this.CurrentDir = line.Substring(0, line.Length-this.HaLineEnd.Length - 1);
+                    this.CurrentDir = line.Substring(0, line.Length - this.HaLineEnd.Length - 1);
                     this.lineEvent.Set();
+                    skipLine = 2;
                     return;
                 }
 
@@ -93,10 +98,8 @@ namespace haterm
             };
             this.cmdproc.BeginErrorReadLine();
 
-            this.Run(this.HaStart);
-            this.startEvent.Wait();
-            UpdateCd();
-            this.console.WriteLine("Ready.");
+            this.UpdateCwd();
+            // this.console.WriteLine("Ready.");
         }
     }
 }
