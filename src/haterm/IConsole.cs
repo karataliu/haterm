@@ -9,6 +9,7 @@ namespace haterm
         int CursorTop { get; }
         int CursorLeft { get; }
         void SetCursorPosition(int cursorTop, int cursorLeft);
+        void Write(char data);
         void Write(string data);
         void WriteLine(string data);
         ConsoleKeyInfo ReadKey();

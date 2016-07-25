@@ -21,6 +21,9 @@ namespace haterm
         public void SetCursorPosition(int cursorTop, int cursorLeft)
             => Console.SetCursorPosition(cursorLeft, cursorTop);
 
+        public void Write(char data)
+            => Console.Write(data);
+
         public void Write(string data)
             => Console.Write(data);
 

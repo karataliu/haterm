@@ -36,7 +36,6 @@ namespace haterm
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,
-                
             };
 
             cmdproc = Process.Start(startInfo);

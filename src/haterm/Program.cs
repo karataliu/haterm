@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 
 namespace haterm
 {
@@ -12,12 +10,21 @@ namespace haterm
             console.WriteLine(console.ToDebugInfo());
 
             var shell = new CmdShell(console);
-            shell.Run("dir");
+            StringBuilder lb = new StringBuilder();
 
             while (true)
             {
                 var key = console.ReadKey();
-                console.Write("P" + key.KeyChar);
+                if (key.KeyChar == 13)
+                {
+                    shell.Run(lb.ToString());
+                    lb.Clear();
+                }
+                else
+                {
+                    lb.Append(key.KeyChar);
+                    console.Write(key.KeyChar);
+                }
             }
 
         }
