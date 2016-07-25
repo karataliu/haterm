@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -14,16 +15,21 @@ namespace haterm
     {
         private readonly IConsole console;
         private readonly IShell shell;
+        private CmdRender rd = new CmdRender();
         private StringBuilder lb = new StringBuilder();
+
+        private Dictionary<ConsoleKey, Action> dic;
 
         public MyConsole(IConsole console, IShell shell)
         {
             this.console = console;
             this.shell = shell;
-        }
-
-        private void OnTab()
-        {
+            dic = new Dictionary<ConsoleKey, Action>
+            {
+                {ConsoleKey.Enter       , this.OnEnter      },
+                {ConsoleKey.Backspace   , this.OnBackspace  },
+                {ConsoleKey.Spacebar    , this.OnWhitespace },
+            };
         }
 
         private void OnEnter()
@@ -33,8 +39,18 @@ namespace haterm
             this.console.WriteLine(this.shell.CurrentDir);
         }
 
-        private void OnWHitespace()
+        private void OnBackspace()
         {
+            lb.Remove(lb.Length - 1, 1);
+            this.console.Write("\b \b");
+        }
+
+        private void OnWhitespace()
+        {
+            lb.Append(' ');
+            var ctx=rd.Render(lb.ToString());
+            this.console.Write('\r');
+            this.console.Write1(ctx.ToArray());
         }
 
         public void Run()
@@ -42,37 +58,15 @@ namespace haterm
             while (true)
             {
                 var key = console.ReadKey();
-                var ch = key.KeyChar;
-                if (ch == 13)
+                Action action;
+                if (dic.TryGetValue(key.Key, out action))
                 {
-                    this.OnEnter();
-                }else if (ch == '\b')
-                {
-                    lb.Remove(lb.Length - 1, 1);
-                    this.console.Write("\b \b");
-                }else if (ch == '\t')
-                {
-                    this.OnTab();
-                }
-                else if (ch == 32)
-                {
-                    lb.Append(ch);
-                    var ctx = this.GetContext();
-                    this.OnWHitespace();
-                    if (ctx.Current != null)
-                    {
-                        this.console.Write('\r');
-                        this.console.Write1(ctx.Current.ToArray());
-                    }
-                    else
-                    {
-                        this.console.Write(ch);
-                    }
+                    action();
                 }
                 else
                 {
-                    lb.Append(ch);
-                    this.console.Write(ch);
+                    lb.Append(key.KeyChar);
+                    this.console.Write(key.KeyChar);
                 }
             }
         }
@@ -89,9 +83,7 @@ namespace haterm
         {
             IConsole console = CmdConsole.Instance;
             var shell = new CmdShell(console);
-
-            var rd = new CmdRender();
-
+            
             var mc = new MyConsole(console, shell);
 
             mc.Run();
