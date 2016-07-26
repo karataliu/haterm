@@ -22,6 +22,8 @@ namespace haterm
         private readonly IStringWriter Output;
         private readonly IStringWriter Error;
 
+        public bool Exited => this.cmdproc.HasExited;
+
         public string CurrentDir { get; set; }
 
         public CmdShell(IStringWriter output, IStringWriter error)
@@ -45,18 +47,21 @@ namespace haterm
             if (this.lineEvent.Wait(timeOut))
             {
                 this.lineEvent.Reset();
+                if (Exited) return;
             }
             else
             {
-                throw new HatermException("Start timeout.");
+                throw new HatermException("Update Cwd timeout.");
             }
         }
 
         public void Dispose()
         {
-            this.cmdproc?.CancelOutputRead();
-            this.cmdproc?.CancelOutputRead();
-            this.cmdproc?.Kill();
+            if (this.cmdproc != null && !this.cmdproc.HasExited){
+                this.cmdproc.CancelOutputRead();
+                this.cmdproc.CancelOutputRead();
+                this.cmdproc.Kill();
+            }
         }
 
         private void CmdInit()
@@ -72,6 +77,12 @@ namespace haterm
             };
 
             cmdproc = Process.Start(startInfo);
+            cmdproc.EnableRaisingEvents = true;
+            cmdproc.Exited += (sender, args) =>
+            {
+                this.Output.WriteLine("Shell exited.");
+                this.lineEvent.Set();
+            };
 
             int skipLine = 0;
             this.cmdproc.OutputDataReceived += (sender, args) =>

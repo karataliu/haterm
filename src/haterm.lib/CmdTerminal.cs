@@ -10,7 +10,7 @@ namespace haterm
         {
             // Console.BackgroundColor = ConsoleColor.DarkGray;
             // Console.ForegroundColor = ConsoleColor.White;
-            Console.Clear();
+            // Console.Clear();
         }
 
         public int Height => Console.BufferHeight;

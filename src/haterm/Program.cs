@@ -21,10 +21,11 @@ namespace haterm
     {
         public static void Main(string[] args)
         {
-            var console = CmdTerminal.Instance;
-            var shell = new CmdShell(new TextWriterWrapper(Console.Out), new TextWriterWrapper(Console.Error));
-            var mc = new Haterm(console, shell);
-            mc.Run();
+            using (var shell = new CmdShell(new TextWriterWrapper(Console.Out), new TextWriterWrapper(Console.Error)))
+            {
+                var mc =new Haterm(CmdTerminal.Instance, shell);
+                mc.Run();
+            }
         }
     }
 }

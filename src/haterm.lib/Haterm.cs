@@ -44,7 +44,10 @@ namespace haterm
             this._terminal.WriteLine("");
             this.shell.Run(lb.ToString());
             lb.Clear();
-            this.WritePrompt();
+            if (!this.shell.Exited)
+            {
+                this.WritePrompt();
+            }
         }
 
         private void OnBackspace()
@@ -74,7 +77,7 @@ namespace haterm
         public void Run()
         {
             this.WritePrompt();
-            while (true)
+            while (!this.shell.Exited)
             {
                 var key = _terminal.ReadKey();
                 Action action;
@@ -88,7 +91,7 @@ namespace haterm
                 {
                     action();
                 }
-                else if(key.KeyChar != 0 && key.Modifiers == 0)
+                else if (key.KeyChar != 0 && key.Modifiers == 0)
                 {
                     lb.Append(key.KeyChar);
                     this._terminal.Write(key.KeyChar);
