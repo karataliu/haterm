@@ -6,7 +6,7 @@ namespace haterm
     {
         private Dictionary<string,string> dic = new Dictionary<string, string>
         {
-            {"G", "|findstr" }
+            {"G", "|findstr /I" }
         };
 
         public string Expand(string input)

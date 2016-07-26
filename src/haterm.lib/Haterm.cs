@@ -65,7 +65,10 @@ namespace haterm
 
         private void OnEnter()
         {
+            this.Expand();
+
             this._terminal.WriteLine("");
+
             this.shell.Run(lb.ToString());
             lb.Clear();
             if (!this.shell.Exited)
