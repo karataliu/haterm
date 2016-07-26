@@ -8,7 +8,7 @@
     <ProjectGuid>{A083A81E-9664-49EB-81FF-137410F62373}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>haterm.lib</RootNamespace>
+    <RootNamespace>haterm</RootNamespace>
     <AssemblyName>haterm.lib</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
@@ -39,7 +39,6 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="CmdRender.cs" />
     <Compile Include="CmdShell.cs" />
     <Compile Include="CmdTerminal.cs" />

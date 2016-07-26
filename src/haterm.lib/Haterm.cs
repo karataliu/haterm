@@ -88,7 +88,7 @@ namespace haterm
                 {
                     action();
                 }
-                else
+                else if(key.KeyChar != 0 && key.Modifiers == 0)
                 {
                     lb.Append(key.KeyChar);
                     this._terminal.Write(key.KeyChar);
