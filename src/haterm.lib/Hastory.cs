@@ -19,11 +19,15 @@ namespace haterm
         private List<string> list = new List<string>();
         private string filepath;
 
-        public Hastory(Guid id, string filePrefix = defaultPrefix)
+        public Hastory():
+            this(HatermConfig.Instance.Id, defaultPrefix)
         {
-            var home = Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
-            Directory.CreateDirectory($"{home}\\haterm");
-            filepath = $"{home}\\haterm\\{filePrefix}-{id}";
+        }
+
+        public Hastory(Guid id, string filePrefix)
+        {
+            var dir = HatermConfig.Instance.Dir;
+            filepath = $"{dir}\\{filePrefix}-{id}";
         }
 
         public void Load()
