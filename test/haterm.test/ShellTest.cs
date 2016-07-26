@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace haterm.test
 {
-
     [TestClass]
     public class ShellTest
     {

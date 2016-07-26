@@ -9,12 +9,13 @@ namespace haterm
     {
         private readonly ITerminal _terminal;
         private readonly IShell shell;
+
+        private AliasExpander ae = new AliasExpander();
         private CmdRender rd = new CmdRender();
         private StringBuilder lb = new StringBuilder();
 
         private Dictionary<ConsoleKey, Action> dic;
         private Dictionary<ConsoleKey, Action> ctrlDic;
-
 
         public Haterm(ITerminal _terminal, IShell shell)
         {
@@ -31,7 +32,16 @@ namespace haterm
             {
                 {ConsoleKey.L           , this.Clear        },
                 {ConsoleKey.D           , this.Exit         },
+                {ConsoleKey.A           , this.Expand       },
             };
+        }
+
+        private void Expand()
+        {
+            var str = lb.ToString();
+            lb.Clear();
+            lb.Append(ae.Expand(str));
+            RenderCurrentLine();
         }
 
         private void Exit()
@@ -42,8 +52,13 @@ namespace haterm
         private void Clear()
         {
             this._terminal.ClearScreen();
-            this.WritePrompt();
+            RenderCurrentLine();
+        }
 
+        private void RenderCurrentLine()
+        {
+            this._terminal.ClearLine();
+            this.WritePrompt();
             var ctx=rd.Render(lb.ToString());
             this._terminal.Write1(ctx.ToArray());
         }
@@ -68,10 +83,7 @@ namespace haterm
         private void OnWhitespace()
         {
             lb.Append(' ');
-            var ctx=rd.Render(lb.ToString());
-            this._terminal.ClearLine();
-            this.WritePrompt();
-            this._terminal.Write1(ctx.ToArray());
+            this.RenderCurrentLine();
         }
 
         public string Prompt

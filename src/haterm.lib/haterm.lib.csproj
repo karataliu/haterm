@@ -39,6 +39,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AliasExpander.cs" />
     <Compile Include="CmdRender.cs" />
     <Compile Include="CmdShell.cs" />
     <Compile Include="CmdTerminal.cs" />
