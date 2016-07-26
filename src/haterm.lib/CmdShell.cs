@@ -4,20 +4,30 @@ using System.Threading;
 
 namespace haterm
 {
+    public interface IStringWriter
+    {
+        void WriteLine(string line);
+    }
+
     public class CmdShell : IShell, IDisposable
     {
+        private const int startTimeout = 2000;
+        private const int defaultTimeout = 60 * 1000;
         private const string Rem = "rem";
         private readonly string HaRunId = Guid.NewGuid().ToString();
         private readonly string HaLineEnd;
         private Process cmdproc;
-        private ITerminal terminal;
         private ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
+
+        private readonly IStringWriter Output;
+        private readonly IStringWriter Error;
 
         public string CurrentDir { get; set; }
 
-        public CmdShell(ITerminal terminal)
+        public CmdShell(IStringWriter output, IStringWriter error)
         {
-            this.terminal = terminal;
+            this.Output = output;
+            this.Error = error;
             HaLineEnd = $"{Rem} {HaRunId}{nameof(HaLineEnd)}";
 
             CmdInit();
@@ -29,11 +39,17 @@ namespace haterm
             UpdateCwd();
         }
 
-        private void UpdateCwd()
+        private void UpdateCwd(int timeOut = defaultTimeout)
         {
             cmdproc.StandardInput.WriteLine(HaLineEnd);
-            this.lineEvent.Wait();
-            this.lineEvent.Reset();
+            if (this.lineEvent.Wait(timeOut))
+            {
+                this.lineEvent.Reset();
+            }
+            else
+            {
+                throw new HatermException("Start timeout.");
+            }
         }
 
         public void Dispose()
@@ -80,24 +96,25 @@ namespace haterm
                     return;
                 }
 
-                terminal.WriteLine(args.Data);
+                Output.WriteLine(args.Data);
             };
 
             this.cmdproc.BeginOutputReadLine();
 
             this.cmdproc.ErrorDataReceived += (sender, args) =>
             {
-                this.terminal.Write1(new TextBlock
-                {
-                    Text = args.Data,
-                    Foreground = ConsoleColor.Red
-                });
-                this.terminal.WriteLine("");
+                //this.terminal.Write1(new TextBlock
+                //{
+                //    Text = args.Data,
+                //    Foreground = ConsoleColor.Red
+                //});
+                //this.terminal.WriteLine("");
+                Error.WriteLine(args.Data);
             };
             this.cmdproc.BeginErrorReadLine();
 
-            this.UpdateCwd();
-            this.terminal.WriteLine(Constants.Branding);
+            this.UpdateCwd(startTimeout);
+            this.Output.WriteLine(Constants.Branding);
         }
     }
 }

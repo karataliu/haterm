@@ -45,6 +45,7 @@
     <Compile Include="CmdTerminal.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Haterm.cs" />
+    <Compile Include="HatermException.cs" />
     <Compile Include="IShell.cs" />
     <Compile Include="ITerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

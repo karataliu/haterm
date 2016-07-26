@@ -14,6 +14,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "haterm", "src\haterm\haterm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "haterm.lib", "src\haterm.lib\haterm.lib.csproj", "{A083A81E-9664-49EB-81FF-137410F62373}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6D6019AE-1816-4361-9369-F678A1F0DEFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "haterm.test", "haterm.test\haterm.test.csproj", "{93465288-E835-40F1-8055-CC338691DDFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +32,10 @@ Global
 		{A083A81E-9664-49EB-81FF-137410F62373}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A083A81E-9664-49EB-81FF-137410F62373}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A083A81E-9664-49EB-81FF-137410F62373}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93465288-E835-40F1-8055-CC338691DDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93465288-E835-40F1-8055-CC338691DDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93465288-E835-40F1-8055-CC338691DDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93465288-E835-40F1-8055-CC338691DDFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -35,5 +43,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C842C8E5-1DA2-4D16-9C32-4846E6E43A5D} = {3B81A70B-A22B-4CDB-85BE-1CC18176D8CC}
 		{A083A81E-9664-49EB-81FF-137410F62373} = {3B81A70B-A22B-4CDB-85BE-1CC18176D8CC}
+		{93465288-E835-40F1-8055-CC338691DDFF} = {6D6019AE-1816-4361-9369-F678A1F0DEFF}
 	EndGlobalSection
 EndGlobal
