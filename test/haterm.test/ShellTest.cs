@@ -31,5 +31,20 @@ namespace haterm.test
             shell.Run("exit");
             shell.Exited.Should().BeTrue();
         }
+
+        [Ignore]
+        [TestMethod]
+        public void RunCmdTest()
+        {
+            using (var shell = new CmdShell(outRecorder, errRecorder))
+            {
+                outRecorder.List.Clear();
+                errRecorder.List.Clear();
+
+                shell.Run("echo 1");
+                outRecorder.List.Should().HaveCount(2);
+                errRecorder.List.Should().BeEmpty();
+            }
+        }
     }
 }

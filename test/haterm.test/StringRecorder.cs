@@ -4,7 +4,7 @@ namespace haterm.test
 {
     internal class StringRecorder : IStringWriter
     {
-        public IReadOnlyList<string> List => list;
+        public IList<string> List => list;
 
         private List<string> list= new List<string>();
 

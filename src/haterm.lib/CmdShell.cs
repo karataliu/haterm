@@ -4,33 +4,31 @@ using System.Threading;
 
 namespace haterm
 {
-    public interface IStringWriter
-    {
-        void WriteLine(string line);
-    }
-
     public class CmdShell : IShell, IDisposable
     {
         private const int startTimeout = 2000;
         private const int defaultTimeout = 60 * 1000;
         private const string Rem = "rem";
+        private const string Rem1 = "rem1";
         private readonly string HaRunId = Guid.NewGuid().ToString();
         private readonly string HaLineEnd;
+        private readonly string ErrHaLineEnd;
         private Process cmdproc;
-        private ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
-
+        private readonly ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
+        private readonly ManualResetEventSlim errLineEvent = new ManualResetEventSlim(false);
         private readonly IStringWriter Output;
         private readonly IStringWriter Error;
 
         public bool Exited => this.cmdproc.HasExited;
 
-        public string CurrentDir { get; set; }
+        public string CurrentDir { get; private set; }
 
         public CmdShell(IStringWriter output, IStringWriter error)
         {
             this.Output = output;
             this.Error = error;
             HaLineEnd = $"{Rem} {HaRunId}{nameof(HaLineEnd)}";
+            ErrHaLineEnd = $"{Rem1} {HaRunId}{nameof(HaLineEnd)}";
 
             CmdInit();
         }
@@ -38,6 +36,7 @@ namespace haterm
         public void Run(string input)
         {
             cmdproc.StandardInput.WriteLine(input);
+            cmdproc.StandardInput.WriteLine(ErrHaLineEnd);
             UpdateCwd();
         }
 
@@ -85,8 +84,12 @@ namespace haterm
             };
 
             int skipLine = 0;
+            int errSkipLine = 0;
+            var obj = new Object();
             this.cmdproc.OutputDataReceived += (sender, args) =>
             {
+                lock (obj) { 
+
                 var line = args.Data;
                 if (line == null)
                 {
@@ -107,20 +110,41 @@ namespace haterm
                     return;
                 }
 
+                if (line.EndsWith(this.ErrHaLineEnd))
+                {
+                    errSkipLine = 2;
+
+                    this.errLineEvent.Wait();
+                    this.errLineEvent.Reset();
+                    return;
+                }
+
                 Output.WriteLine(args.Data);
+                }
             };
 
             this.cmdproc.BeginOutputReadLine();
 
             this.cmdproc.ErrorDataReceived += (sender, args) =>
             {
-                //this.terminal.Write1(new TextBlock
-                //{
-                //    Text = args.Data,
-                //    Foreground = ConsoleColor.Red
-                //});
-                //this.terminal.WriteLine("");
-                Error.WriteLine(args.Data);
+                var line = args.Data;
+                if (line == null)
+                {
+                    return;
+                }
+
+                if (errSkipLine > 0)
+                {
+                    --errSkipLine;
+                    if (errSkipLine == 0)
+                    {
+                        this.errLineEvent.Set();
+                    }
+
+                    return;
+                }
+
+                Error.WriteLine("E:" + line);
             };
             this.cmdproc.BeginErrorReadLine();
 

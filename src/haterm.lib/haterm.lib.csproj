@@ -46,6 +46,7 @@
     <Compile Include="Haterm.cs" />
     <Compile Include="HatermException.cs" />
     <Compile Include="IShell.cs" />
+    <Compile Include="IStringWriter.cs" />
     <Compile Include="ITerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
