@@ -15,7 +15,10 @@ namespace haterm.test
         {
             var shell = new CmdShell(outRecorder, errRecorder);
             errRecorder.List.Should().BeEmpty();
-            outRecorder.List.Should().HaveCount(4);
+            outRecorder.List.Should().HaveCount(5);
+
+            outRecorder.List[3].Should().StartWith("Haterm");
+            outRecorder.List[4].Should().BeEmpty();
         }
     }
 }

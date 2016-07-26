@@ -115,6 +115,7 @@ namespace haterm
 
             this.UpdateCwd(startTimeout);
             this.Output.WriteLine(Constants.Branding);
+            this.Output.WriteLine("");
         }
     }
 }
