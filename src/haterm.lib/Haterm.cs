@@ -43,6 +43,9 @@ namespace haterm
         {
             this._terminal.ClearScreen();
             this.WritePrompt();
+
+            var ctx=rd.Render(lb.ToString());
+            this._terminal.Write1(ctx.ToArray());
         }
 
         private void OnEnter()

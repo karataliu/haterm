@@ -148,7 +148,7 @@ namespace haterm
                 return;
             }
 
-            this.dualOutput.ErrWriteLine("E:" + line);
+            this.dualOutput.ErrWriteLine(line);
         }
 
         private Process CreateCmdProcess()
