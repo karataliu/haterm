@@ -25,6 +25,33 @@ namespace haterm
 
         public IEnumerable<TextBlock> Render(string line)
         {
+            List<TextBlock> list = new List<TextBlock>();
+            var items = line.Split('|');
+            bool first = true;
+            foreach (var item in items)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    list.Add(new TextBlock
+                    {
+                        Text = "|",
+                        Foreground = ConsoleColor.DarkMagenta
+                    });
+                }
+
+                list.AddRange(renderSingle(item));
+
+            }
+
+            return list;
+        }
+
+        public IEnumerable<TextBlock> renderSingle(string line)
+        {
             var pattern = new Regex("^(.*?) (.*)$");
             var match = pattern.Match(line);
             if (match.Success)

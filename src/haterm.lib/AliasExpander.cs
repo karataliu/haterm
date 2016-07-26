@@ -6,7 +6,9 @@ namespace haterm
     {
         private Dictionary<string,string> dic = new Dictionary<string, string>
         {
-            {"G", "|findstr /I" }
+            {"G", "|findstr /I" },
+            {"gb", "git branch" },
+            {"gc", "git clone" },
         };
 
         public string Expand(string input)
@@ -14,7 +16,14 @@ namespace haterm
             var output = input;
             foreach (var item in dic)
             {
-                output = output.Replace($" {item.Key} ", $" {item.Value} ");
+                if (output.StartsWith(item.Key))
+                {
+                    output = output.Replace(item.Key, item.Value);
+                }
+                else
+                {
+                    output = output.Replace($" {item.Key} ", $" {item.Value} ");
+                }
             }
 
             return output;
