@@ -5,6 +5,54 @@ using System.Linq;
 
 namespace haterm
 {
+    public class HistoryManager : IDisposable
+    {
+        private Hastory ha = new Hastory();
+        private int id = -1;
+        private string lastSearch = null;
+
+        public HistoryManager()
+        {
+            ha.Load();
+        }
+
+        public void ClearState()
+        {
+            id = -1;
+        }
+
+        public void Add(string line)
+        {
+            this.ha.Add(line);
+        }
+
+        public string Search(string line, bool backward)
+        {
+            if (line != lastSearch)
+            {
+                this.ClearState();
+                lastSearch = line;
+            }
+
+            var result = ha.Search(line, id, backward);
+            if (result == SearchCombo.NotFound)
+            {
+                return null;
+            }
+            else
+            {
+                id = result.Id;
+                return result.Line;
+            }
+        }
+
+        public void Dispose()
+        {
+            this.ha.Save();
+        }
+    }
+
+
     public class SearchCombo
     {
         public static SearchCombo NotFound = new SearchCombo();
@@ -19,7 +67,7 @@ namespace haterm
         private List<string> list = new List<string>();
         private string filepath;
 
-        public Hastory():
+        public Hastory() :
             this(HatermConfig.Instance.Id, defaultPrefix)
         {
         }

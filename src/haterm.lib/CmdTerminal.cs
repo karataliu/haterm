@@ -56,6 +56,8 @@ namespace haterm
         public void ClearLine()
         {
             Console.Write('\r');
+            Console.Write(new string(' ', this.Width - 1 ));
+            Console.Write('\r');
         }
 
         public void ClearScreen()

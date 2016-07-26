@@ -10,12 +10,15 @@ namespace haterm
         private readonly ITerminal _terminal;
         private readonly IShell shell;
 
+        private HistoryManager hm = new HistoryManager();
         private AliasExpander ae = new AliasExpander();
         private CmdRender rd = new CmdRender();
-        private StringBuilder lb = new StringBuilder();
+        private LineBuffer lb = new LineBuffer();
 
         private Dictionary<ConsoleKey, Action> dic;
         private Dictionary<ConsoleKey, Action> ctrlDic;
+
+        private int promptLen;
 
         public Haterm(ITerminal _terminal, IShell shell)
         {
@@ -23,9 +26,13 @@ namespace haterm
             this.shell = shell;
             dic = new Dictionary<ConsoleKey, Action>
             {
-                {ConsoleKey.Enter       , this.OnEnter      },
-                {ConsoleKey.Backspace   , this.OnBackspace  },
-                {ConsoleKey.Spacebar    , this.OnWhitespace },
+                {ConsoleKey.Enter       , this.OnEnter          },
+                {ConsoleKey.Backspace   , this.OnBackspace      },
+                {ConsoleKey.Spacebar    , this.OnWhitespace     },
+                {ConsoleKey.UpArrow     , this.BackSearch       },
+                {ConsoleKey.DownArrow   , this.ForwardSearch    },
+                {ConsoleKey.LeftArrow   , this.MoveBack         },
+                {ConsoleKey.RightArrow  , this.MoveForward      },
             };
 
             ctrlDic = new Dictionary<ConsoleKey, Action>
@@ -33,14 +40,65 @@ namespace haterm
                 {ConsoleKey.L           , this.Clear        },
                 {ConsoleKey.D           , this.Exit         },
                 {ConsoleKey.A           , this.Expand       },
+                {ConsoleKey.E           , this.ShowDebug    },
             };
+        }
+
+        private void ShowDebug()
+        {
+            this._terminal.WriteLine("");
+            this._terminal.WriteLine($"DEBUG:");
+            this.RenderCurrentLine();
+        }
+
+        private void MoveBack()
+        {
+            if (lb.Back())
+            {
+                UpdateCursor();
+            }
+        }
+
+        private void MoveForward()
+        {
+            if (lb.Forward())
+            {
+                UpdateCursor();
+            }
+        }
+
+        private void UpdateCursor()
+        {
+            this._terminal.SetCursorPosition(this._terminal.CursorTop, promptLen + this.lb.CurrentIndex);
+        }
+
+        private void BackSearch()
+        {
+            this.search(true);
+        }
+
+        private void ForwardSearch()
+        {
+            this.search(false);
+        }
+
+        private void search(bool backward)
+        {
+            var index = lb.CurrentIndex;
+            var result = this.hm.Search(lb.LineToCur, backward);
+            if (result != null)
+            {
+                this.lb.Replace(result);
+            }
+
+            this.RenderCurrentLine();
+            lb.CurrentIndex = index;
+            this.UpdateCursor();
         }
 
         private void Expand()
         {
-            var str = lb.ToString();
-            lb.Clear();
-            lb.Append(ae.Expand(str));
+            this.lb.Replace(ae.Expand(lb.Line));
             RenderCurrentLine();
         }
 
@@ -57,35 +115,43 @@ namespace haterm
 
         private void RenderCurrentLine()
         {
+            var line = lb.Line;
             this._terminal.ClearLine();
             this.WritePrompt();
-            var ctx=rd.Render(lb.ToString());
+            var ctx=rd.Render(line);
             this._terminal.Write1(ctx.ToArray());
         }
 
         private void OnEnter()
         {
+            this.hm.ClearState();
             this.Expand();
-
             this._terminal.WriteLine("");
 
-            this.shell.Run(lb.ToString());
-            lb.Clear();
+            var line = lb.Line;
+            lb.Replace("");
+            this.hm.Add(line);
+            this.shell.Run(line);
+
             if (!this.shell.Exited)
             {
-                this.WritePrompt();
+                this.RenderCurrentLine();
             }
         }
 
         private void OnBackspace()
         {
-            if (lb.Length > 0) lb.Remove(lb.Length - 1, 1);
-            if (this._terminal.CursorLeft > this.Prompt.Length) this._terminal.Backspace();
+            lb.Backspace();
+            if (this._terminal.CursorLeft > this.Prompt.Length)
+            {
+                this._terminal.Backspace();
+
+            }
         }
 
         private void OnWhitespace()
         {
-            lb.Append(' ');
+            lb.Add(' ');
             this.RenderCurrentLine();
         }
 
@@ -95,12 +161,13 @@ namespace haterm
         private void WritePrompt()
         {
             this._terminal.Write(this.Prompt);
+            this.promptLen = this.Prompt.Length;
             Console.Out.Flush();
         }
 
         public void Run()
         {
-            this.WritePrompt();
+            this.RenderCurrentLine();
             while (!this.shell.Exited)
             {
                 var key = _terminal.ReadKey();
@@ -119,7 +186,7 @@ namespace haterm
                 {
                     if (key.Modifiers == 0 || key.Modifiers == ConsoleModifiers.Shift)
                     {
-                        lb.Append(key.KeyChar);
+                        lb.Add(key.KeyChar);
                         this._terminal.Write(key.KeyChar);
                     }
                 }
