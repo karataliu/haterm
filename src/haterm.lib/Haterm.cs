@@ -64,6 +64,8 @@ namespace haterm
 
         private void Hint()
         {
+            this.Expand();
+
             string lw = null;
 
             this.ClearHint();

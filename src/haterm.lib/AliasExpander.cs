@@ -7,9 +7,9 @@ namespace haterm
     {
         private Dictionary<string,string> dic = new Dictionary<string, string>
         {
-            {"G", "|findstr /I" },
-            {"gb", "git branch" },
-            {"gc", "git clone" },
+            {"G", "|findstr /I"     },
+            {"gb", "git branch"     },
+            {"gc", "git checkout"   },
         };
 
         public string Expand(string input)
