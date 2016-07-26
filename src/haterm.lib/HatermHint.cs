@@ -16,6 +16,37 @@ namespace haterm
 
     class HatermHint
     {
+        public IEnumerable<HintItem> getHint(string path, string line)
+        {
+            if (line.StartsWith("git "))
+            {
+                return getGitHint("");
+            }
+            else
+            {
+                var pat = line.Split(' ').Last();
+
+                return getDirHint(path, pat);
+            }
+        }
+
+        private string[] gitCmds = new string[] {"branch", "checkout", "clone"};
+
+        public IEnumerable<HintItem> getGitHint(string pattern)
+        {
+            foreach (var cmd in gitCmds)
+            {
+                if (cmd.StartsWith(pattern))
+                {
+                    yield return new HintItem
+                    {
+                        Category = "git-cmd",
+                        Word = cmd,
+                    };
+                }
+            }
+        }
+
         public IEnumerable<HintItem> getDirHint(string path, string pattern)
         {
             var list = new List<HintItem>();

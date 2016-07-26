@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace haterm
 {
@@ -70,7 +69,7 @@ namespace haterm
 
             this.ClearHint();
             this._terminal.PushCursor();
-            var he1 = hh.getDirHint(this.shell.CurrentDir, this.lb.Line);
+            var he1 = hh.getHint(this.shell.CurrentDir, this.lb.Line);
             var ng = he1.GroupBy(item => item.Category);
             maxhint = 0;
             this._terminal.WriteLine("");
