@@ -30,7 +30,13 @@ namespace haterm
             ctrlDic = new Dictionary<ConsoleKey, Action>
             {
                 {ConsoleKey.L           , this.Clear        },
+                {ConsoleKey.D           , this.Exit         },
             };
+        }
+
+        private void Exit()
+        {
+            this.shell.Exit();
         }
 
         private void Clear()

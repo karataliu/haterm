@@ -50,6 +50,11 @@ namespace haterm
             UpdateCwd();
         }
 
+        public void Exit()
+        {
+            this.cmdproc.Kill();
+        }
+
         private void UpdateCwd(int timeOut = defaultTimeout)
         {
             cmdproc.StandardInput.WriteLine(HaLineEnd);
