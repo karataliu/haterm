@@ -2,11 +2,11 @@
 
 namespace haterm
 {
-    public class CmdConsole : IConsole
+    public class CmdTerminal : ITerminal
     {
-        public static CmdConsole Instance { get; } = new CmdConsole();
+        public static CmdTerminal Instance { get; } = new CmdTerminal();
 
-        private CmdConsole()
+        private CmdTerminal()
         {
             // Console.BackgroundColor = ConsoleColor.DarkGray;
             // Console.ForegroundColor = ConsoleColor.White;

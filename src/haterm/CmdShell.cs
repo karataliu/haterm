@@ -10,14 +10,14 @@ namespace haterm
         private readonly string HaRunId = Guid.NewGuid().ToString();
         private readonly string HaLineEnd;
         private Process cmdproc;
-        private IConsole console;
+        private ITerminal terminal;
         private ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
 
         public string CurrentDir { get; set; }
 
-        public CmdShell(IConsole console)
+        public CmdShell(ITerminal terminal)
         {
-            this.console = console;
+            this.terminal = terminal;
             HaLineEnd = $"{Rem} {HaRunId}{nameof(HaLineEnd)}";
 
             CmdInit();
@@ -72,8 +72,6 @@ namespace haterm
                     return;
                 }
 
-                
-
                 if (line.EndsWith(this.HaLineEnd))
                 {
                     this.CurrentDir = line.Substring(0, line.Length - this.HaLineEnd.Length - 1);
@@ -82,24 +80,24 @@ namespace haterm
                     return;
                 }
 
-                console.WriteLine(args.Data);
+                terminal.WriteLine(args.Data);
             };
 
             this.cmdproc.BeginOutputReadLine();
 
             this.cmdproc.ErrorDataReceived += (sender, args) =>
             {
-                this.console.Write1(new TextBlock
+                this.terminal.Write1(new TextBlock
                 {
                     Text = args.Data,
                     Foreground = ConsoleColor.Red
                 });
-                this.console.WriteLine("");
+                this.terminal.WriteLine("");
             };
             this.cmdproc.BeginErrorReadLine();
 
             this.UpdateCwd();
-            // this.console.WriteLine("Ready.");
+            this.terminal.WriteLine(Constants.Branding);
         }
     }
 }

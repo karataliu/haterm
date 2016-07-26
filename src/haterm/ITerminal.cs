@@ -2,7 +2,7 @@
 
 namespace haterm
 {
-    public interface IConsole
+    public interface ITerminal
     {
         int Height { get; }
         int Width { get; }
@@ -21,9 +21,9 @@ namespace haterm
 
     public static class ExtensionMethods
     {
-        public static string ToDebugInfo(this IConsole console)
+        public static string ToDebugInfo(this ITerminal _terminal)
         {
-            return $"Haconsole Height:{console.Height},Width:{console.Width},CTop:{console.CursorTop},CLeft:{console.CursorLeft}";
+            return $"Haconsole Height:{_terminal.Height},Width:{_terminal.Width},CTop:{_terminal.CursorTop},CLeft:{_terminal.CursorLeft}";
         }
     }
 }
