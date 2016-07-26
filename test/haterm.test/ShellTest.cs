@@ -32,7 +32,6 @@ namespace haterm.test
             shell.Exited.Should().BeTrue();
         }
 
-        [Ignore]
         [TestMethod]
         public void RunCmdTest()
         {
@@ -44,6 +43,21 @@ namespace haterm.test
                 shell.Run("echo 1");
                 outRecorder.List.Should().HaveCount(2);
                 errRecorder.List.Should().BeEmpty();
+            }
+        }
+
+        [TestMethod]
+        public void RunErrorCmdTest()
+        {
+            using (var shell = new CmdShell(outRecorder, errRecorder))
+            {
+                outRecorder.List.Clear();
+                errRecorder.List.Clear();
+
+                shell.Run("echo1");
+                outRecorder.List.Should().HaveCount(1);
+                outRecorder.List[0].Should().BeEmpty();
+                errRecorder.List.Should().HaveCount(2);
             }
         }
     }
