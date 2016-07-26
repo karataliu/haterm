@@ -48,6 +48,7 @@
     <Compile Include="Haterm.cs" />
     <Compile Include="HatermConfig.cs" />
     <Compile Include="HatermException.cs" />
+    <Compile Include="HatermHint.cs" />
     <Compile Include="IShell.cs" />
     <Compile Include="IStringWriter.cs" />
     <Compile Include="ITerminal.cs" />

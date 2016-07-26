@@ -17,6 +17,8 @@ namespace haterm
         void ClearScreen();
         void Backspace();
         ConsoleKeyInfo ReadKey();
+        void PushCursor();
+        void PopCursor();
     }
 
     public static class ExtensionMethods

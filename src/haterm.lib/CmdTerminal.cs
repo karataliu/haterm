@@ -51,7 +51,10 @@ namespace haterm
         }
 
         public void WriteLine(string data)
-            => Console.WriteLine(data);
+        {
+            if (this.CursorTop == this.Height - 1) t1--;
+            Console.WriteLine(data);
+        }
 
         public void ClearLine()
         {
@@ -72,5 +75,19 @@ namespace haterm
 
         public ConsoleKeyInfo ReadKey()
             => Console.ReadKey(true);
+
+        private int t1;
+        private int l1;
+
+        public void PushCursor()
+        {
+            this.t1 = this.CursorTop;
+            this.l1 = this.CursorLeft;
+        }
+
+        public void PopCursor()
+        {
+            this.SetCursorPosition(t1, l1);
+        }
     }
 }

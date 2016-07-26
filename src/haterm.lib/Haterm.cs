@@ -10,6 +10,7 @@ namespace haterm
         private readonly ITerminal _terminal;
         private readonly IShell shell;
 
+        private HatermHint hh = new HatermHint();
         private HistoryManager hm = new HistoryManager();
         private AliasExpander ae = new AliasExpander();
         private CmdRender rd = new CmdRender();
@@ -33,6 +34,7 @@ namespace haterm
                 {ConsoleKey.DownArrow   , this.ForwardSearch    },
                 {ConsoleKey.LeftArrow   , this.MoveBack         },
                 {ConsoleKey.RightArrow  , this.MoveForward      },
+                {ConsoleKey.Tab         , this.Hint             },
             };
 
             ctrlDic = new Dictionary<ConsoleKey, Action>
@@ -40,8 +42,57 @@ namespace haterm
                 {ConsoleKey.L           , this.Clear        },
                 {ConsoleKey.D           , this.Exit         },
                 {ConsoleKey.A           , this.Expand       },
-                {ConsoleKey.E           , this.ShowDebug    },
+                {ConsoleKey.E           , this.ClearHint    },
             };
+        }
+
+        private void ClearHint()
+        {
+            if (this.maxhint > 0)
+            {
+                this._terminal.PushCursor();
+                while (maxhint-- > 0)
+                {
+                    this._terminal.SetCursorPosition(this._terminal.CursorTop + 1, 0);
+                    Console.Write(new string(' ', this._terminal.Width - 1));
+                }
+                this._terminal.PopCursor();
+            }
+        }
+
+        private int maxhint = 0;
+
+        private void Hint()
+        {
+            string lw = null;
+
+            this.ClearHint();
+            this._terminal.PushCursor();
+            var he1 = hh.getDirHint(this.shell.CurrentDir, this.lb.Line);
+            var ng = he1.GroupBy(item => item.Category);
+            maxhint = 0;
+            this._terminal.WriteLine("");
+            foreach (var item in ng)
+            {
+                this._terminal.WriteLine($"---{item.Key}--");
+                maxhint++;
+                foreach (var word in item)
+                {
+                    this._terminal.WriteLine($"{word.Word} ");
+                    maxhint++;
+                    lw = word.Word;
+                }
+            }
+
+            this._terminal.PopCursor();
+
+            if (maxhint == 2)
+            {
+                for(var i = lb.Line.Length; i < lw.Length; i++)
+                    this.lb.Add(lw[i]);
+                this.ClearHint();
+                this.RenderCurrentLine();
+            }
         }
 
         private void ShowDebug()
@@ -130,6 +181,7 @@ namespace haterm
 
         private void OnEnter()
         {
+            this.ClearHint();
             this.hm.ClearState();
             this.Expand();
             this._terminal.WriteLine("");

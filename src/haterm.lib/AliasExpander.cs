@@ -32,11 +32,17 @@ namespace haterm
 
         public string ExpandDir(string cwd, string input)
         {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
             var output = input;
             var path = Path.Combine(cwd, input);
             if (Directory.Exists(path))
             {
                 return $"cd {input}";
+            }else if (File.Exists(path))
+            {
+                return $"start {input}";
             }
 
             return output;
