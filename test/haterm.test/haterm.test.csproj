@@ -73,7 +73,7 @@
     <Compile Include="StringRecorder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\haterm.lib\haterm.lib.csproj">
+    <ProjectReference Include="..\..\src\haterm.lib\haterm.lib.csproj">
       <Project>{a083a81e-9664-49eb-81ff-137410f62373}</Project>
       <Name>haterm.lib</Name>
     </ProjectReference>

@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "haterm.lib", "src\haterm.li
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6D6019AE-1816-4361-9369-F678A1F0DEFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "haterm.test", "haterm.test\haterm.test.csproj", "{93465288-E835-40F1-8055-CC338691DDFF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "haterm.test", "test\haterm.test\haterm.test.csproj", "{93465288-E835-40F1-8055-CC338691DDFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
