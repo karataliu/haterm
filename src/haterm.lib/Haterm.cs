@@ -112,10 +112,13 @@ namespace haterm
                 {
                     action();
                 }
-                else if (key.KeyChar != 0 && key.Modifiers == 0)
+                else if (key.KeyChar != 0)
                 {
-                    lb.Append(key.KeyChar);
-                    this._terminal.Write(key.KeyChar);
+                    if (key.Modifiers == 0 || key.Modifiers == ConsoleModifiers.Shift)
+                    {
+                        lb.Append(key.KeyChar);
+                        this._terminal.Write(key.KeyChar);
+                    }
                 }
             }
         }
