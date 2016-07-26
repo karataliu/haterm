@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace haterm
 {
@@ -24,6 +25,18 @@ namespace haterm
                 {
                     output = output.Replace($" {item.Key} ", $" {item.Value} ");
                 }
+            }
+
+            return output;
+        }
+
+        public string ExpandDir(string cwd, string input)
+        {
+            var output = input;
+            var path = Path.Combine(cwd, input);
+            if (Directory.Exists(path))
+            {
+                return $"cd {input}";
             }
 
             return output;

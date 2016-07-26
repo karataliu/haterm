@@ -99,6 +99,12 @@ namespace haterm
         private void Expand()
         {
             this.lb.Replace(ae.Expand(lb.Line));
+
+            if (!this.lb.Line.Contains(' '))
+            {
+                this.lb.Replace(ae.ExpandDir(this.shell.CurrentDir, lb.Line));
+            }
+
             RenderCurrentLine();
         }
 
