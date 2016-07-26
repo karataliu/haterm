@@ -2,15 +2,19 @@
 
 namespace haterm.test
 {
-    internal class StringRecorder : IStringWriter
+    internal class OutRecorder : IDualOutput
     {
-        public IList<string> List => list;
+        public IList<string> Out { get; } = new List<string>();
+        public IList<string> Err { get; } = new List<string>();
 
-        private List<string> list= new List<string>();
-
-        public void WriteLine(string line)
+        public void OutWriteLine(string line)
         {
-            list.Add(line);
+            Out.Add(line);
+        }
+
+        public void ErrWriteLine(string line)
+        {
+            Err.Add(line);
         }
     }
 }

@@ -18,19 +18,17 @@ namespace haterm
         private readonly Process cmdproc;
         private readonly ManualResetEventSlim lineEvent = new ManualResetEventSlim(false);
         private readonly ManualResetEventSlim errLineEvent = new ManualResetEventSlim(false);
-        private readonly IStringWriter Output;
-        private readonly IStringWriter Error;
-        private List<string> outputBuffer = new List<string>();
+        private readonly IDualOutput dualOutput;
 
+        private List<string> outputBuffer = new List<string>();
 
         public bool Exited => this.cmdproc.HasExited;
 
         public string CurrentDir { get; private set; }
 
-        public CmdShell(IStringWriter output, IStringWriter error)
+        public CmdShell(IDualOutput dualOutput)
         {
-            this.Output = output;
-            this.Error = error;
+            this.dualOutput = dualOutput;
             HaLineEnd = $"{Rem} {HaRunId}{nameof(HaLineEnd)}";
             ErrHaLineEnd = $"{Rem1} {HaRunId}{nameof(HaLineEnd)}";
             ErrHaLineEndOut = $"'{Rem1}' is not recognized as an internal or external command,";
@@ -38,8 +36,8 @@ namespace haterm
             this.cmdproc = CreateCmdProcess();
             this.UpdateCwd(startTimeout);
             this.FlushOutput();
-            this.Output.WriteLine(Constants.Branding);
-            this.Output.WriteLine("");
+            this.dualOutput.OutWriteLine(Constants.Branding);
+            this.dualOutput.OutWriteLine("");
         }
 
         public void Run(string input)
@@ -114,7 +112,7 @@ namespace haterm
         {
             foreach (var line in outputBuffer)
             {
-                Output.WriteLine(line);
+                this.dualOutput.OutWriteLine(line);
             }
             outputBuffer.Clear();
         }
@@ -145,7 +143,7 @@ namespace haterm
                 return;
             }
 
-            Error.WriteLine("E:" + line);
+            this.dualOutput.ErrWriteLine("E:" + line);
         }
 
         private Process CreateCmdProcess()
@@ -168,7 +166,7 @@ namespace haterm
             process.ErrorDataReceived += Process_ErrorDataReceived;
             process.Exited += (sender, args) =>
             {
-                this.Output.WriteLine("Shell exited.");
+                this.dualOutput.OutWriteLine("Shell exited.");
                 this.errLineEvent.Set();
                 this.lineEvent.Set();
             };

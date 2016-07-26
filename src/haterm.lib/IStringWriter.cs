@@ -1,7 +1,8 @@
 ﻿namespace haterm
 {
-    public interface IStringWriter
+    public interface IDualOutput
     {
-        void WriteLine(string line);
+        void OutWriteLine(string line);
+        void ErrWriteLine(string line);
     }
 }

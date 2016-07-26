@@ -7,26 +7,25 @@ namespace haterm.test
     [TestClass]
     public class ShellTest
     {
-        private StringRecorder outRecorder = new StringRecorder();
-        private StringRecorder errRecorder = new StringRecorder();
-
+        private OutRecorder recorder = new OutRecorder();
+        
         [TestMethod]
         public void StartupTest()
         {
-            using (var shell = new CmdShell(outRecorder, errRecorder))
+            using (var shell = new CmdShell(recorder))
             {
-                errRecorder.List.Should().BeEmpty();
-                outRecorder.List.Should().HaveCount(5);
+                recorder.Out.Should().HaveCount(5);
+                recorder.Out[3].Should().StartWith("Haterm");
+                recorder.Out[4].Should().BeEmpty();
 
-                outRecorder.List[3].Should().StartWith("Haterm");
-                outRecorder.List[4].Should().BeEmpty();
+                recorder.Err.Should().BeEmpty();
             }
         }
 
         [TestMethod]
         public void ExitTest()
         {
-            var shell = new CmdShell(outRecorder, errRecorder);
+            var shell = new CmdShell(recorder);
             shell.Exited.Should().BeFalse();
             shell.Run("exit");
             shell.Exited.Should().BeTrue();
@@ -35,29 +34,29 @@ namespace haterm.test
         [TestMethod]
         public void RunCmdTest()
         {
-            using (var shell = new CmdShell(outRecorder, errRecorder))
+            using (var shell = new CmdShell(recorder))
             {
-                outRecorder.List.Clear();
-                errRecorder.List.Clear();
+                recorder.Out.Clear();
+                recorder.Err.Clear();
 
                 shell.Run("echo 1");
-                outRecorder.List.Should().HaveCount(2);
-                errRecorder.List.Should().BeEmpty();
+                recorder.Out.Should().HaveCount(2);
+                recorder.Err.Should().BeEmpty();
             }
         }
 
         [TestMethod]
         public void RunErrorCmdTest()
         {
-            using (var shell = new CmdShell(outRecorder, errRecorder))
+            using (var shell = new CmdShell(recorder))
             {
-                outRecorder.List.Clear();
-                errRecorder.List.Clear();
+                recorder.Out.Clear();
+                recorder.Err.Clear();
 
                 shell.Run("echo1");
-                outRecorder.List.Should().HaveCount(1);
-                outRecorder.List[0].Should().BeEmpty();
-                errRecorder.List.Should().HaveCount(2);
+                recorder.Out.Should().HaveCount(1);
+                recorder.Out[0].Should().BeEmpty();
+                recorder.Err.Should().HaveCount(2);
             }
         }
     }

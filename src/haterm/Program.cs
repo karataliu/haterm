@@ -3,17 +3,25 @@ using System.IO;
 
 namespace haterm
 {
-    class TextWriterWrapper : IStringWriter
+    class DualWrapper : IDualOutput
     {
-        private TextWriter textWriter;
-        public TextWriterWrapper(TextWriter textWriter)
+        public DualWrapper()
         {
-            this.textWriter = textWriter;
         }
 
-        public void WriteLine(string line)
+        public void OutWriteLine(string line)
         {
-            this.textWriter.WriteLine(line);
+            if (line == "\f")
+            {
+                Console.Clear();
+                return;
+            }
+            Console.Out.WriteLine(line);
+        }
+
+        public void ErrWriteLine(string line)
+        {
+            Console.Error.WriteLine(line);
         }
     }
 
@@ -21,7 +29,7 @@ namespace haterm
     {
         public static void Main(string[] args)
         {
-            using (var shell = new CmdShell(new TextWriterWrapper(Console.Out), new TextWriterWrapper(Console.Error)))
+            using (var shell = new CmdShell(new DualWrapper()))
             {
                 var mc =new Haterm(CmdTerminal.Instance, shell);
                 mc.Run();
