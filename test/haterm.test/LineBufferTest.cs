@@ -76,5 +76,35 @@ namespace haterm.test
             lb.Line.Should().Be("abcde");
             lb.LineToCur.Should().Be("abcde");
         }
+
+        [TestMethod]
+        public void ReplaceLastSegmentTest()
+        {
+            var lb = new LineBuffer();
+            lb.Add('1');
+            lb.Add('2');
+            lb.Add(' ');
+            lb.Add('4');
+            lb.Add('5');
+            lb.Line.Should().Be("12 45");
+
+            lb.ReplaceLastSegment("abcde");
+            lb.Line.Should().Be("12 abcde");
+        }
+
+        [TestMethod]
+        public void ReplaceLastSegmentWithNoSpaceTest()
+        {
+            var lb = new LineBuffer();
+            lb.Add('1');
+            lb.Add('2');
+            lb.Add('3');
+            lb.Add('4');
+            lb.Add('5');
+            lb.Line.Should().Be("12345");
+
+            lb.ReplaceLastSegment("abcde");
+            lb.Line.Should().Be("abcde");
+        }
     }
 }

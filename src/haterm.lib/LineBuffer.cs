@@ -17,6 +17,22 @@ namespace haterm
             this.CurrentIndex = newStr.Length;
         }
 
+        public void ReplaceLastSegment(string newStr)
+        {
+            var l = this.builder.Length;
+            var i = l - 1;
+            while (i >= 0 && builder[i] != ' ') --i;
+            if (i < 0)
+            {
+                this.Replace(newStr);
+                return;
+            }
+
+            this.builder.Remove(i + 1, l - i - 1);
+            this.builder.Append(newStr);
+            this.CurrentIndex = this.builder.Length;
+        }
+
         public void Add(char ch)
         {
             if (CurrentIndex == this.builder.Length)

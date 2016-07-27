@@ -89,8 +89,9 @@ namespace haterm
 
             if (maxhint == 2)
             {
-                for(var i = lb.Line.Length; i < lw.Length; i++)
-                    this.lb.Add(lw[i]);
+                //for(var i = lb.Line.Length; i < lw.Length; i++)
+                //    this.lb.Add(lw[i]);
+                this.lb.ReplaceLastSegment(lw);
                 this.ClearHint();
                 this.RenderCurrentLine();
             }
