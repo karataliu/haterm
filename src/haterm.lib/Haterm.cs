@@ -41,7 +41,7 @@ namespace haterm
                 {ConsoleKey.L           , this.Clear        },
                 {ConsoleKey.D           , this.Exit         },
                 {ConsoleKey.A           , this.Expand       },
-                {ConsoleKey.E           , this.ClearHint    },
+                {ConsoleKey.E           , this.ShowDebug    },
             };
         }
 
@@ -100,7 +100,7 @@ namespace haterm
         private void ShowDebug()
         {
             this._terminal.WriteLine("");
-            this._terminal.WriteLine($"DEBUG:");
+            this._terminal.WriteLine($"DEBUG:cd:{this.shell.CurrentDir}");
             this.RenderCurrentLine();
         }
 
