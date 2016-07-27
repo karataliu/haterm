@@ -24,11 +24,11 @@ namespace haterm
                 var list = File.ReadAllLines(cfg);
                 foreach (var item in list)
                 {
-                    var kv =item.Split('=');
-                    if (kv.Length != 2) continue;
+                    var index = item.IndexOf('=');
+                    if (index < 0) continue;
 
-                    var key = kv[0].Trim(' ');
-                    var val = kv[1].Trim(' ');
+                    var key = item.Substring(0, index);
+                    var val = item.Substring(index + 1);
 
                     if (string.Equals(key, nameof(Id), StringComparison.OrdinalIgnoreCase))
                     {
@@ -38,6 +38,10 @@ namespace haterm
                     else if (string.Equals(key, nameof(GitPath), StringComparison.OrdinalIgnoreCase))
                     {
                         GitPath = val;
+                    }
+                    else if (string.Equals(key, nameof(DbString), StringComparison.OrdinalIgnoreCase))
+                    {
+                        DbString = val;
                     }
                 }
             }
@@ -60,6 +64,7 @@ namespace haterm
                 {
                     $"Id={Id}",
                     $"GitPath={GitPath}",
+                    $"DbString={DbString}",
                 };
 
             File.WriteAllLines(cfg, list);
@@ -70,5 +75,6 @@ namespace haterm
         public Guid Id { get; private set; }
         public string GitPath { get; private set; }
 
+        public string DbString { get; private set; }
     }
 }
