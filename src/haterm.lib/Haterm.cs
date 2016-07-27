@@ -180,6 +180,8 @@ namespace haterm
             this._terminal.Write1(ctx.ToArray());
         }
 
+        private string lastLine = "'";
+
         private void OnEnter()
         {
             this.ClearHint();
@@ -189,6 +191,7 @@ namespace haterm
 
             var line = lb.Line;
             lb.Replace("");
+            lastLine = line;
             this.hm.Add(line);
             this.shell.Run(line);
 
@@ -224,12 +227,27 @@ namespace haterm
             Console.Out.Flush();
         }
 
+        private bool escaped = false;
+
         public void Run()
         {
             this.RenderCurrentLine();
             while (!this.shell.Exited)
             {
                 var key = _terminal.ReadKey();
+
+                if (this.escaped)
+                {
+                    this.escaped = false;
+                    if (key.KeyChar == '.')
+                    {
+                        this.lb.Add(lastLine.Split(' ').Last());
+                        this.RenderCurrentLine();
+                    }
+
+                    continue;
+                }
+
                 Action action;
                 IDictionary<ConsoleKey, Action> lookup = dic;
                 if (key.Modifiers == ConsoleModifiers.Control)
@@ -240,6 +258,9 @@ namespace haterm
                 if (lookup.TryGetValue(key.Key, out action))
                 {
                     action();
+                }else if (key.KeyChar == 27)
+                {
+                    escaped = true;
                 }
                 else if (key.KeyChar != 0)
                 {

@@ -46,6 +46,14 @@ namespace haterm
             this.CurrentIndex++;
         }
 
+        public void Add(string str)
+        {
+            foreach (var ch in str)
+            {
+                this.Add(ch);
+            }
+        }
+
         public bool Back()
         {
             if (this.CurrentIndex > 0)
