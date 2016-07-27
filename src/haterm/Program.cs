@@ -4,10 +4,20 @@
     {
         public static void Main(string[] args)
         {
-            using (var shell = new CmdShell(new DualWrapper()))
+            IShell shell = null;
+            try
             {
-                var mc =new Haterm(CmdTerminal.Instance, shell);
-                mc.Run();
+                shell = new CmdShell(new DualWrapper());
+                using (var haterm = new Haterm(CmdTerminal.Instance, shell))
+                {
+                    shell = null;
+                    haterm.Run();
+                }
+            }
+            finally
+            {
+                if (shell != null)
+                    shell.Dispose();
             }
         }
     }

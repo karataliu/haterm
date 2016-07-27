@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace haterm
 {
-    public class Haterm
+    public class Haterm : IDisposable
     {
         private readonly ITerminal _terminal;
         private readonly IShell shell;
@@ -271,6 +271,11 @@ namespace haterm
                     }
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            this.hm.Dispose();
         }
     }
 }

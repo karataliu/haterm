@@ -23,6 +23,9 @@ namespace haterm
 
         public void Add(string line)
         {
+            if (string.IsNullOrWhiteSpace(line))
+                return;
+
             this.ha.Add(line);
         }
 

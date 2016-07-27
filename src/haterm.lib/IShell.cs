@@ -1,6 +1,8 @@
-﻿namespace haterm
+﻿using System;
+
+namespace haterm
 {
-    public interface IShell
+    public interface IShell : IDisposable
     {
         bool Exited { get; }
         string CurrentDir { get; }
