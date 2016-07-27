@@ -21,8 +21,44 @@ namespace haterm
         public string LastSegment { get; set; }
     }
 
-    internal class HatermHint
+    public class HintResult
     {
+        public IEnumerable<IGrouping<string, HintItem>> Groups { get; set; }
+        public int ResultCount { get; set; }
+        public string CommonPrefix { get; set; }
+    }
+
+    public class HatermHint
+    {
+        public static string getCommonPrefix(IList<string> list)
+        {
+            var len = list.Count();
+            if (len == 0)
+            {
+                return "";
+            }else if (len == 1)
+            {
+                return list[0];
+            }
+            else
+            {
+                var bas = TwoStringCommonPrefix(list[0], list[1]);
+                foreach (var item in list.Skip(2))
+                {
+                    bas = TwoStringCommonPrefix(bas, item);
+                }
+
+                return bas;
+            }
+        }
+
+        private static string TwoStringCommonPrefix(string a, string b)
+        {
+            int i = 0;
+            while (i < a.Length && i < b.Length && a[i] == b[i]) ++i;
+            return a.Substring(0, i);
+        }
+
         private Dictionary<string, Func<HintContext, IEnumerable<HintItem>>> dic = new Dictionary<string, Func<HintContext, IEnumerable<HintItem>>>
         {
             { "git checkout ", getGitCheckoutHint},
@@ -30,8 +66,10 @@ namespace haterm
             { "",   getDirHint},
         };
 
-        public IEnumerable<HintItem> getHint(string path, string line)
+        public HintResult getHint(string path, string line)
         {
+            IList<HintItem> items = new List<HintItem>();
+
             var ctx = new HintContext
             {
                 CurrentDir = path,
@@ -43,11 +81,19 @@ namespace haterm
             {
                 if (line.StartsWith(item.Key))
                 {
-                    return item.Value.Invoke(ctx);
+                    items =  item.Value.Invoke(ctx).ToList();
+                    break;
                 }
             }
 
-            return Enumerable.Empty<HintItem>();
+            var words = items.Select(i => i.Word.ToLowerInvariant()).ToList();
+
+            return new HintResult
+            {
+                Groups = items.GroupBy(item => item.Category),
+                ResultCount = words.Count,
+                CommonPrefix = getCommonPrefix(words)
+            };
         }
 
         private static IEnumerable<HintItem> getGitCheckoutHint(HintContext context)
@@ -56,9 +102,9 @@ namespace haterm
 
             branches.AddRange(GetGitBranches(context.CurrentDir));
 
-            return branches.Where(name=>name.StartsWith(context.LastSegment)).Select(name => new HintItem
+            return branches.Where(name => name.StartsWith(context.LastSegment)).Select(name => new HintItem
             {
-                Category = "Git " + (name.Contains('/') ? "Remote" : "Local") + "Branch" ,
+                Category = "Git " + (name.Contains('/') ? "Remote" : "Local") + "Branch",
                 Word = name,
             });
         }
@@ -113,14 +159,31 @@ namespace haterm
         private static IEnumerable<HintItem> getDirHint(HintContext context)
         {
             var list = new List<HintItem>();
-            var di = new DirectoryInfo(context.CurrentDir);
             var pattern = context.LastSegment;
+
+            string dirPath = context.CurrentDir;
+            string pathInPattern = "";
+            if (pattern.Contains("\\"))
+            {
+                var index = pattern.LastIndexOf('\\');
+                pathInPattern = pattern.Substring(0, index + 1);
+                pattern = pattern.Substring(index + 1);
+
+                dirPath = Path.Combine(context.CurrentDir, pathInPattern);
+                if (!Directory.Exists(dirPath))
+                {
+                    return Enumerable.Empty<HintItem>();
+                }
+            }
+
+            var di = new DirectoryInfo(dirPath);
+            
             foreach (var item in di.EnumerateDirectories(pattern + "*"))
             {
                 list.Add(new HintItem
                 {
                     Category = "Directory",
-                    Word = item.Name,
+                    Word = pathInPattern + item.Name,
                 });
             }
 
@@ -129,7 +192,7 @@ namespace haterm
                 list.Add(new HintItem
                 {
                     Category = "File",
-                    Word = item.Name,
+                    Word = pathInPattern + item.Name,
                 });
             }
 

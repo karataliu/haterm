@@ -70,7 +70,7 @@ namespace haterm
             this.ClearHint();
             this._terminal.PushCursor();
             var he1 = hh.getHint(this.shell.CurrentDir, this.lb.Line);
-            var ng = he1.GroupBy(item => item.Category);
+            var ng = he1.Groups;
             maxhint = 0;
             this._terminal.WriteLine("");
             foreach (var item in ng)
@@ -87,14 +87,13 @@ namespace haterm
 
             this._terminal.PopCursor();
 
-            if (maxhint == 2)
+            if (he1.ResultCount > 0)
             {
-                //for(var i = lb.Line.Length; i < lw.Length; i++)
-                //    this.lb.Add(lw[i]);
-                this.lb.ReplaceLastSegment(lw);
-                this.ClearHint();
-                this.RenderCurrentLine();
+                this.lb.ReplaceLastSegment(he1.CommonPrefix);
+                // this.ClearHint();
             }
+
+            this.RenderCurrentLine();
         }
 
         private void ShowDebug()
