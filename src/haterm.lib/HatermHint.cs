@@ -107,7 +107,7 @@ namespace haterm
 
             return branches.Where(name => name.StartsWith(context.LastSegment)).Select(name => new HintItem
             {
-                Category = "Git " + (name.Contains('/') ? "Remote" : "Local") + "Branch",
+                Category = "Git " + (name.Contains('/') ? "Remote" : "Local") + " Branch",
                 Word = name,
             });
         }

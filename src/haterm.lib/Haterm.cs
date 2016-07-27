@@ -79,7 +79,11 @@ namespace haterm
 
             foreach (var item in ng)
             {
+                var fg = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 this._terminal.WriteLine($"---{item.Key}--");
+                Console.ForegroundColor = fg;
+
                 maxhint++;
                 foreach (var word in item)
                 {
