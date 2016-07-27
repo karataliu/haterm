@@ -73,13 +73,31 @@ namespace haterm
             var ng = he1.Groups;
             maxhint = 0;
             this._terminal.WriteLine("");
+
+            int maxword = 30;
+            int maxdesc = this._terminal.Width - maxword;
+
             foreach (var item in ng)
             {
                 this._terminal.WriteLine($"---{item.Key}--");
                 maxhint++;
                 foreach (var word in item)
                 {
-                    this._terminal.WriteLine($"{word.Word} ");
+                    var show = word.Word;
+                    if (show.Length > maxword)
+                    {
+                        show = show.Substring(0, maxword);
+                    }
+
+                    this._terminal.Write($"{show}");
+                    this._terminal.Write(new string(' ', maxword - show.Length));
+                    var desc = word.Description ?? string.Empty;
+                    if (desc.Length > maxdesc)
+                    {
+                        desc = desc.Substring(0, maxdesc);
+                    }
+                    this._terminal.WriteLine(desc);
+
                     maxhint++;
                     lw = word.Word;
                 }

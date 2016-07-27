@@ -12,6 +12,7 @@ namespace haterm
     {
         public string Category { get; set; }
         public string Word { get; set; }
+        public string Description { get; set; }
     }
 
     public class HintContext
@@ -138,19 +139,27 @@ namespace haterm
         }
 
 
-        private static string[] gitCmds = new string[] {"branch", "checkout", "clone"};
+        private static Dictionary<string,string> gitCmds = new Dictionary<string, string>
+        {
+            { "add",        "Add file to index."        },
+            { "branch",     "List branches."            },
+            { "checkout",   "Switch between branches."  },
+            { "clean",      "Remove untracked items."   },
+            { "fetch",      "Download remote changes."  },
+        };
 
         private static IEnumerable<HintItem> getGitHint(HintContext context)
         {
             var pattern = context.LastSegment;
             foreach (var cmd in gitCmds)
             {
-                if (cmd.StartsWith(pattern))
+                if (cmd.Key.StartsWith(pattern))
                 {
                     yield return new HintItem
                     {
                         Category = "git-cmd",
-                        Word = cmd,
+                        Word = cmd.Key,
+                        Description = cmd.Value,
                     };
                 }
             }
