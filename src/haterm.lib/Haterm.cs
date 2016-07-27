@@ -74,7 +74,7 @@ namespace haterm
             maxhint = 0;
             this._terminal.WriteLine("");
 
-            int maxword = 30;
+            int maxword = 42;
             int maxdesc = this._terminal.Width - maxword;
 
             foreach (var item in ng)
@@ -91,13 +91,18 @@ namespace haterm
 
                     this._terminal.Write($"{show}");
                     this._terminal.Write(new string(' ', maxword - show.Length));
-                    var desc = word.Description ?? string.Empty;
-                    if (desc.Length > maxdesc)
-                    {
-                        desc = desc.Substring(0, maxdesc);
-                    }
-                    this._terminal.WriteLine(desc);
 
+                    if (!string.IsNullOrEmpty(word.Description))
+                    {
+                        var desc = word.Description;
+                        if (desc.Length > maxdesc)
+                        {
+                            desc = desc.Substring(0, maxdesc);
+                        }
+                        this._terminal.Write(" - " + desc);
+                    }
+
+                    this._terminal.WriteLine(string.Empty);
                     maxhint++;
                     lw = word.Word;
                 }
@@ -276,7 +281,8 @@ namespace haterm
                 if (lookup.TryGetValue(key.Key, out action))
                 {
                     action();
-                }else if (key.KeyChar == 27)
+                }
+                else if (key.KeyChar == 27)
                 {
                     escaped = true;
                 }

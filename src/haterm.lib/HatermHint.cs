@@ -202,6 +202,7 @@ namespace haterm
                 {
                     Category = "File",
                     Word = pathInPattern + item.Name,
+                    Description = FileTypeHelper.FileTypeInfo(item.FullName)
                 });
             }
 

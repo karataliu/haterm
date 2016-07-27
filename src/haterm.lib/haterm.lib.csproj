@@ -46,6 +46,7 @@
     <Compile Include="CmdTerminal.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DualWrapper.cs" />
+    <Compile Include="FileTypeHelper.cs" />
     <Compile Include="Hastory.cs" />
     <Compile Include="Haterm.cs" />
     <Compile Include="HatermConfig.cs" />
