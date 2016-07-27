@@ -39,6 +39,9 @@ namespace haterm
             var path = Path.Combine(cwd, input);
             if (Directory.Exists(path))
             {
+                if (input.Contains(":"))
+                    return $"cd /d {input}";
+
                 return $"cd {input}";
             }else if (File.Exists(path))
             {
