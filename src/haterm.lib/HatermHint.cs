@@ -37,7 +37,8 @@ namespace haterm
             if (len == 0)
             {
                 return "";
-            }else if (len == 1)
+            }
+            else if (len == 1)
             {
                 return list[0];
             }
@@ -64,6 +65,7 @@ namespace haterm
         {
             { "git checkout ", getGitCheckoutHint},
             { "git ", getGitHint},
+            { "dir ", getDirCmdHint},
             { "",   getDirHint},
         };
 
@@ -82,7 +84,7 @@ namespace haterm
             {
                 if (line.StartsWith(item.Key))
                 {
-                    items =  item.Value.Invoke(ctx).ToList();
+                    items = item.Value.Invoke(ctx).ToList();
                     break;
                 }
             }
@@ -157,12 +159,33 @@ namespace haterm
                 {
                     yield return new HintItem
                     {
-                        Category = "git-cmd",
+                        Category = "git commandd",
                         Word = cmd.Key,
                         Description = cmd.Value,
                     };
                 }
             }
+        }
+
+        private static Dictionary<string,string> dirParameters = new Dictionary<string, string>
+        {
+            { "/w",        "Use wide list format."      },
+            { "/q",        "Display owner."             },
+            { "/ad",       "List all directories."      },
+            { "/ah",       "List all hidden files."     },
+        };
+
+        private static IEnumerable<HintItem> getDirCmdHint(HintContext context)
+        {
+            var pattern = context.LastSegment;
+            return dirParameters
+                .Where(item => item.Key.StartsWith(context.LastSegment))
+                .Select(item => new HintItem
+            {
+                Category = "dir parameters",
+                Word = item.Key,
+                Description = item.Value,
+            }).Concat(getDirHint(context));
         }
 
         private static IEnumerable<HintItem> getDirHint(HintContext context)
@@ -172,6 +195,8 @@ namespace haterm
 
             string dirPath = context.CurrentDir;
             string pathInPattern = "";
+            if (pattern.Contains("/")) return list;
+
             if (pattern.Contains("\\"))
             {
                 var index = pattern.LastIndexOf('\\');
@@ -186,7 +211,7 @@ namespace haterm
             }
 
             var di = new DirectoryInfo(dirPath);
-            
+
             foreach (var item in di.EnumerateDirectories(pattern + "*"))
             {
                 list.Add(new HintItem
