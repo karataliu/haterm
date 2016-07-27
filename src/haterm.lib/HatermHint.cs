@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace haterm
 {
@@ -148,6 +146,7 @@ namespace haterm
             { "checkout",   "Switch between branches."  },
             { "clean",      "Remove untracked items."   },
             { "fetch",      "Download remote changes."  },
+            { "init",       "Initialize a git repo."    },
         };
 
         private static IEnumerable<HintItem> getGitHint(HintContext context)

@@ -245,7 +245,7 @@ namespace haterm
         }
 
         public string Prompt
-            => this.shell.CurrentDir + "=>";
+            => this.shell.CurrentDir + ">";
 
         private void WritePrompt()
         {
