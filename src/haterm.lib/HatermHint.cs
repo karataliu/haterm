@@ -158,7 +158,7 @@ namespace haterm
                 {
                     yield return new HintItem
                     {
-                        Category = "git commandd",
+                        Category = "git commands",
                         Word = cmd.Key,
                         Description = cmd.Value,
                     };
