@@ -21,7 +21,7 @@ namespace haterm
                     var key = item.Substring(0, index);
                     var val = item.Substring(index + 1);
 
-                    dic.Add(key, val);
+                    dic[key] = val;
                 }
             }
             catch (Exception)
